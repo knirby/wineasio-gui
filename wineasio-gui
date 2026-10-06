@@ -1,0 +1,14 @@
+#!/usr/bin/env python3
+"""Launcher: works from a git checkout and from an installed copy."""
+import os
+import sys
+
+here = os.path.dirname(os.path.realpath(__file__))
+for candidate in (here, os.path.join(here, "..", "share", "wineasio-gui")):
+    if os.path.isdir(os.path.join(candidate, "wineasio_gui")):
+        sys.path.insert(0, os.path.abspath(candidate))
+        break
+
+from wineasio_gui.cli import main  # noqa: E402
+
+sys.exit(main())

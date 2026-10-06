@@ -1,0 +1,45 @@
+#!/bin/sh
+# Install wineasio-gui for this user (~/.local) or, with --system, for everyone (/usr/local).
+#   ./install                   install for you
+#   sudo ./install --system     install for all users
+#   ./install --uninstall       remove (add --system for a system install)
+set -eu
+cd "$(dirname "$0")"
+prefix="$HOME/.local"
+action=install
+for arg in "$@"; do
+    case "$arg" in
+        --system) prefix=/usr/local ;;
+        --uninstall) action=uninstall ;;
+        *) echo "usage: $0 [--system] [--uninstall]" >&2; exit 2 ;;
+    esac
+done
+app=io.github.knirby.WineAsioGui
+share="$prefix/share"
+
+if [ "$action" = uninstall ]; then
+    rm -rf "$share/wineasio-gui"
+    rm -f "$prefix/bin/wineasio-gui" "$share/applications/$app.desktop" \
+          "$share/icons/hicolor/scalable/apps/$app.svg"
+    echo "Removed wineasio-gui from $prefix. Your settings in ~/.config were left alone."
+    exit 0
+fi
+
+python3 -c 'import sys; sys.exit(sys.version_info < (3, 10))' \
+    || { echo "wineasio-gui needs Python 3.10 or newer" >&2; exit 1; }
+python3 -c 'import gi; gi.require_version("Adw", "1"); from gi.repository import Adw' 2>/dev/null \
+    || echo "note: the window needs PyGObject with GTK 4 and libadwaita; the CLI works without them"
+
+mkdir -p "$share/wineasio-gui" "$prefix/bin" "$share/applications" "$share/icons/hicolor/scalable/apps"
+rm -rf "$share/wineasio-gui/wineasio_gui"
+cp -r wineasio_gui "$share/wineasio-gui/"
+find "$share/wineasio-gui" -name __pycache__ -prune -exec rm -rf {} +
+install -m 755 wineasio-gui "$prefix/bin/wineasio-gui"
+install -m 644 data/$app.desktop "$share/applications/$app.desktop"
+install -m 644 data/$app.svg "$share/icons/hicolor/scalable/apps/$app.svg"
+command -v update-desktop-database >/dev/null && update-desktop-database -q "$share/applications" || true
+# Refresh an icon cache only where one exists; without a cache GTK reads the folder directly.
+if [ -f "$share/icons/hicolor/icon-theme.cache" ] && command -v gtk-update-icon-cache >/dev/null; then
+    gtk-update-icon-cache -q -t -f "$share/icons/hicolor" 2>/dev/null || true
+fi
+echo "Installed wineasio-gui to $prefix. Run 'wineasio-gui' or open WineASIO Settings."

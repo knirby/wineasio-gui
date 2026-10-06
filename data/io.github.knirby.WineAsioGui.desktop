@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=WineASIO Settings
+GenericName=ASIO Settings
+Comment=Buffer size, sample rate and driver settings for WineASIO
+Exec=wineasio-gui
+Icon=io.github.knirby.WineAsioGui
+Terminal=false
+Categories=AudioVideo;Audio;
+Keywords=wine;asio;jack;pipewire;latency;buffer;audio;daw;
+StartupNotify=true
