@@ -150,6 +150,12 @@ PipeWire's current rate. Set the sample rate to the one your project uses.
 other environment variables over the registry. The window shows a banner if any are
 set, and `doctor` lists them.
 
+## See also
+
+[fl4wine-tools](https://github.com/knirby/fl4wine-tools) has guides and tools for
+running FL Studio with WineASIO on Linux, including the Wine fixes FL Studio 2026
+needs.
+
 ## License
 
 GPL-3.0-only. See [LICENSE](LICENSE).
